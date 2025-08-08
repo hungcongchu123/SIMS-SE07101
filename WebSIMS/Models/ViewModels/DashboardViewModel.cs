@@ -6,6 +6,7 @@
         public int TotalCourses { get; set; }
 
         public List<CourseInfo> Courses { get; set; }
+        public string CurrentUserRole { get; set; }// thêm dòng này để hiện thị vai trò của người dùng hiện tại
 
         public class CourseInfo
         {

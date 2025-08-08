@@ -1,4 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using WebSIMS.BDContext.Entities;
 using WebSIMS.DBContext.Entities;
 
 namespace WebSIMS.DBContext.Entities
@@ -7,9 +9,11 @@ namespace WebSIMS.DBContext.Entities
     {
         [Key]
         public int StudentID { get; set; }
+
         [Required]
         [StringLength(20)]
-        public string StudentCode { get; set; } = string.Empty; // ✅ THÊM DÒNG 
+        public string StudentCode { get; set; } = string.Empty;
+
         [Required]
         public string FirstName { get; set; } = string.Empty;
 

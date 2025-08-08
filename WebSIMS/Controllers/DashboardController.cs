@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WebSIMS.BDContext;
+using WebSIMS.DBContext;
 using WebSIMS.Models.ViewModels;
 using System.Linq;
+using System.Security.Claims;
 
 namespace WebSIMS.Controllers
 {
@@ -28,11 +29,23 @@ namespace WebSIMS.Controllers
                 CourseName = c.CourseName
             }).ToList();
 
+            //dhs lỗi
+            //var model = new DashboardViewModel
+            //{
+            //    TotalStudents = totalStudents,
+            //    TotalCourses = totalCourses,
+            //    Courses = courses,
+            //    CurrentUserRole = userRole
+            //};
+            
+            var userRole = User.FindFirst(ClaimTypes.Role)?.Value ?? "N/A";
+
             var model = new DashboardViewModel
             {
                 TotalStudents = totalStudents,
                 TotalCourses = totalCourses,
-                Courses = courses
+                Courses = courses,
+                CurrentUserRole = userRole
             };
 
             return View(model);

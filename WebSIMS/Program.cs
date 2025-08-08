@@ -1,18 +1,20 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using WebSIMS.BDContext;
+using WebSIMS.DBContext;
 using WebSIMS.Interfaces;
 using WebSIMS.Repositories;
 using WebSIMS.Services;
 using WebSIMS.Services.Implementations;
 using WebSIMS.Services.Interfaces;
 
+
 namespace WebSIMS
 {
     public class Program
     {
         public static void Main(string[] args)
-        {
+       {
             var builder = WebApplication.CreateBuilder(args);
 
             // Configure database with EntityFramework
@@ -25,8 +27,10 @@ namespace WebSIMS
             builder.Services.AddControllersWithViews();
             builder.Services.AddScoped<UserService>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
-            builder.Services.AddScoped<IStudentRepository, StudentRepository>();
+            builder.Services.AddScoped<IStudentRepository,StudentRepository>();
             builder.Services.AddScoped<IStudentService, StudentService>();
+            // Đăng ký dịch vụ (Services)
+            builder.Services.AddScoped<IFacultyService, FacultyService>();
 
 
             builder.Services.AddScoped<ICourseService, CourseService>();
@@ -72,6 +76,12 @@ namespace WebSIMS
             app.MapControllerRoute(
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}");
+
+            // mapFacultyController
+            app.MapControllerRoute(
+            name: "faculty",
+            pattern: "Faculty/{action=Index}/{id?}",
+            defaults: new { controller = "Faculty", action = "Index" });
 
 
             app.Run();

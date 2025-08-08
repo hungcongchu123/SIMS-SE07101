@@ -1,0 +1,60 @@
+﻿@model WebSIMS.DBContext.Entities.Faculty
+
+@{
+    ViewData["Title"] = "Add New Faculty";
+    Layout = "~/Views/Shared/_LayoutMain.cshtml";
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success mt-3">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger mt-3">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3 class="card-title mb-0">👨‍🏫 Add New Faculty</h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" asp-controller="Faculty" method="post">
+                        <div class="mb-3">
+                            <label asp-for="FirstName" class="form-label"></label>
+                            <input asp-for="FirstName" class="form-control" />
+                            <span asp-validation-for="FirstName" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="LastName" class="form-label"></label>
+                            <input asp-for="LastName" class="form-control" />
+                            <span asp-validation-for="LastName" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label"></label>
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="HireDate" class="form-label"></label>
+                            <input asp-for="HireDate" type="date" class="form-control" />
+                            <span asp-validation-for="HireDate" class="text-danger"></span>
+                        </div>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <button type="submit" class="btn btn-success me-md-2">Create</button>
+                            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

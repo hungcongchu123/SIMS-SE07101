@@ -1,12 +1,12 @@
-﻿// Controllers/CourseController.cs
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WebSIMS.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using WebSIMS.BDContext.Entities;
-using Microsoft.AspNetCore.Authorization;
+using WebSIMS.Services.Interfaces;
 
 namespace WebSIMS.Controllers
 {
-    [Authorize(Roles = "Admin,Student,Faculty")] // Toàn bộ controller đều cần đăng nhập và thuộc 1 trong 3 role
+    [Authorize(Roles = "Admin,Faculty")]
     public class CourseController : Controller
     {
         private readonly ICourseService _courseService;
@@ -15,64 +15,133 @@ namespace WebSIMS.Controllers
         {
             _courseService = courseService;
         }
+
         [HttpGet]
         public async Task<IActionResult> Index()
         {
             var courses = await _courseService.GetAllAsync();
             return View(courses);
         }
+
         [HttpGet]
-        [Authorize(Roles = "Admin")] // Chỉ Admin được tạo
-        public IActionResult Create() => View();
+        public IActionResult Create()
+        {
+            return View();
+        }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")] // Chỉ Admin được tạo
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Courses course)
+        public async Task<IActionResult> Create([Bind("CourseCode,CourseName,Description,Credits,Department")] Courses course)
         {
-            if (!ModelState.IsValid) return View(course);
-
-            await _courseService.AddAsync(course);
-            return RedirectToAction(nameof(Index));
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    await _courseService.AddAsync(course);
+                    TempData["SuccessMessage"] = "Course added successfully!";
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (DbUpdateException ex)
+                {
+                    if (ex.InnerException?.Message.Contains("duplicate key") == true)
+                    {
+                        ModelState.AddModelError("CourseCode", "Course code already exists.");
+                        TempData["ErrorMessage"] = "Course code already exists.";
+                    }
+                    else
+                    {
+                        TempData["ErrorMessage"] = $"An unexpected error occurred: {ex.Message}";
+                    }
+                    return View(course);
+                }
+            }
+            TempData["ErrorMessage"] = "Please correct the errors in the form.";
+            return View(course);
         }
-        [HttpGet]
-        [Authorize(Roles = "Admin")] // Chỉ Admin được sửa
-        public async Task<IActionResult> Edit(int id)
-        {
-            var course = await _courseService.GetByIdAsync(id);
-            if (course == null) return NotFound();
 
+        [HttpGet]
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                TempData["ErrorMessage"] = "Course not found.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var course = await _courseService.GetByIdAsync(id.Value);
+            if (course == null)
+            {
+                TempData["ErrorMessage"] = "Course not found.";
+                return RedirectToAction(nameof(Index));
+            }
             return View(course);
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")] // Chỉ Admin được sửa
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Courses course)
+        public async Task<IActionResult> Edit(int id, [Bind("CourseID,CourseCode,CourseName,Description,Credits,Department,CreatedAt")] Courses course)
         {
-            if (!ModelState.IsValid) return View(course);
+            if (id != course.CourseID)
+            {
+                TempData["ErrorMessage"] = "Data mismatch.";
+                return RedirectToAction(nameof(Index));
+            }
 
-            await _courseService.UpdateAsync(course);
-            return RedirectToAction(nameof(Index));
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    await _courseService.UpdateAsync(course);
+                    TempData["SuccessMessage"] = "Course updated successfully!";
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    TempData["ErrorMessage"] = "The course has been modified by another user. Please try again.";
+                    return View(course);
+                }
+                catch (Exception ex)
+                {
+                    TempData["ErrorMessage"] = $"An unexpected error occurred: {ex.Message}";
+                    return View(course);
+                }
+            }
+            TempData["ErrorMessage"] = "Please correct the errors in the form.";
+            return View(course);
         }
+
         [HttpGet]
-        [Authorize(Roles = "Admin")] // Chỉ Admin được xóa
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int? id)
         {
-            var course = await _courseService.GetByIdAsync(id);
-            if (course == null) return NotFound();
+            if (id == null)
+            {
+                TempData["ErrorMessage"] = "Course not found.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var course = await _courseService.GetByIdAsync(id.Value);
+            if (course == null)
+            {
+                TempData["ErrorMessage"] = "Course not found.";
+                return RedirectToAction(nameof(Index));
+            }
 
             return View(course);
         }
 
         [HttpPost, ActionName("Delete")]
-        [Authorize(Roles = "Admin")] // Chỉ Admin được xóa
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var result = await _courseService.DeleteAsync(id);
-            if (!result) return NotFound();
-
+            try
+            {
+                await _courseService.DeleteAsync(id);
+                TempData["SuccessMessage"] = "Course deleted successfully!";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"An error occurred while deleting the course: {ex.Message}";
+            }
             return RedirectToAction(nameof(Index));
         }
     }

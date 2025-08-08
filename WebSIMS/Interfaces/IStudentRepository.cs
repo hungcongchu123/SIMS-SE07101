@@ -10,4 +10,5 @@ namespace WebSIMS.Interfaces
         Task UpdateAsync(Student student);
         Task DeleteAsync(int id);
     }
+    
 }

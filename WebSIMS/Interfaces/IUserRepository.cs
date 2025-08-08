@@ -6,7 +6,12 @@ namespace WebSIMS.Interfaces
     {
         Task<Users?> GetUserByUsername(string username);
         Task<Users?> GetUserById(int id);
-        Task AddAsync (Users user);
+        Task<List<Users>> GetAllAsync();
+        Task<List<Users>> GetUsersByRoleAsync(string role);
+        Task AddAsync(Users user);
+        void Update(Users user);
+        void Delete(Users user);
         Task SaveChangeAsync();
+        
     }
 }

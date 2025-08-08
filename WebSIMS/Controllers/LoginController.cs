@@ -19,7 +19,7 @@ namespace WebSIMS.Controllers
         }
 
         [HttpGet]
-        [AllowAnonymous] // khong bat phai dang nhap 
+        [AllowAnonymous] // khong bat phai dang nhap
         public IActionResult Index()
         {
             if (User.Identity?.IsAuthenticated == true)
@@ -47,6 +47,7 @@ namespace WebSIMS.Controllers
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, user.Username),
+                    // ✅ Dòng code đã được thêm để lưu vai trò của người dùng
                     new Claim(ClaimTypes.Role, user.Role),
                     new Claim("UserID", user.UserID.ToString()) // 🟢 thêm dòng này
                 };

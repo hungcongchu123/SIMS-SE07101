@@ -1,10 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WebSIMS.BDContext.Entities;
-using WebSIMS.Models;
 using WebSIMS.DBContext.Entities;
+using WebSIMS.Models;
 
-
-namespace WebSIMS.BDContext
+namespace WebSIMS.DBContext 
 {
     public class SIMSDBContext : DbContext
     {
@@ -13,30 +12,41 @@ namespace WebSIMS.BDContext
         public DbSet<Courses> CoursesDb { get; set; }
         public DbSet<Users> UsersDb { get; set; }
         public DbSet<Student> StudentsDb { get; set; }
+        public DbSet<Faculty> Faculties { get; set; }
+        public DbSet<Users> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // table Users
+            // Table Users
             modelBuilder.Entity<Users>().ToTable("Users");
             modelBuilder.Entity<Users>().HasKey("UserID");
             modelBuilder.Entity<Users>().HasIndex("Username").IsUnique();
             modelBuilder.Entity<Users>().Property("Role").HasDefaultValue("Student");
 
-            // table Courses
+            // Table Courses
             modelBuilder.Entity<Courses>().ToTable("Courses");
             modelBuilder.Entity<Courses>().HasKey("CourseID");
             modelBuilder.Entity<Courses>().HasIndex("CourseCode").IsUnique();
 
-            // table Students 
+            // Table Students
             modelBuilder.Entity<Student>().ToTable("Students");
             modelBuilder.Entity<Student>().HasKey(s => s.StudentID);
-            
 
-            // Relationship
+            // Table Faculty
+            modelBuilder.Entity<Faculty>().ToTable("Faculties");
+            modelBuilder.Entity<Faculty>().HasKey(f => f.FacultyID);
+
+            // Relationship User and Student
             modelBuilder.Entity<Student>()
                 .HasOne(s => s.User)
                 .WithMany()
                 .HasForeignKey("UserID");
+
+            // Relationship User and Faculty
+            modelBuilder.Entity<Faculty>()
+                .HasOne(f => f.User)
+                .WithMany()
+                .HasForeignKey(f => f.UserID);
         }
     }
 }
