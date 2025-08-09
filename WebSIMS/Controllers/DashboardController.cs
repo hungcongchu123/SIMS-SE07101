@@ -20,7 +20,7 @@ namespace WebSIMS.Controllers
         [Authorize(Roles = "Admin, Student, Faculty")]
         public IActionResult Index()
         {
-            var totalStudents = _context.UsersDb.Count(u => u.Role == "Student");
+            var totalStudents = _context.StudentsDb.Count();
             var totalCourses = _context.CoursesDb.Count();
 
             var courses = _context.CoursesDb.Select(c => new DashboardViewModel.CourseInfo

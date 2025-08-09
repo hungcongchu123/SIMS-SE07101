@@ -1,61 +1,90 @@
-﻿// Services/Implementations/CourseService.cs
-using Microsoft.EntityFrameworkCore;
-using WebSIMS.BDContext;
-using WebSIMS.BDContext.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using WebSIMS.DBContext.Entities;
 using WebSIMS.DBContext;
-using WebSIMS.Services.Interfaces;
+using WebSIMS.Interfaces;
 
-namespace WebSIMS.Services.Implementations
+namespace WebSIMS.Services
 {
     public class CourseService : ICourseService
     {
         private readonly SIMSDBContext _context;
+        private readonly AutoEnrollmentService _autoEnrollmentService;
 
-        public CourseService(SIMSDBContext context)
+        public CourseService(SIMSDBContext context, AutoEnrollmentService autoEnrollmentService)
         {
             _context = context;
+            _autoEnrollmentService = autoEnrollmentService;
         }
 
-        public async Task<IEnumerable<Courses>> GetAllAsync()
+        public async Task<List<Courses>> GetAllCoursesAsync()
         {
             return await _context.CoursesDb.ToListAsync();
         }
 
-        public async Task<Courses?> GetByIdAsync(int id)
+        public async Task<Courses?> GetCourseByIdAsync(int id)
         {
             return await _context.CoursesDb.FindAsync(id);
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<bool> AddCourseAsync(Courses course)
         {
-            var course = await _context.CoursesDb.FindAsync(id);
-            if (course == null) return false;
-
-            _context.CoursesDb.Remove(course);
-            await _context.SaveChangesAsync();
-            return true;
+            try
+            {
+                course.CreatedAt = DateTime.Now;
+                _context.CoursesDb.Add(course);
+                await _context.SaveChangesAsync();
+                
+                // Tự động đăng ký tất cả students hiện có vào course mới
+                await _autoEnrollmentService.AutoEnrollNewCourseAsync(course.CourseID);
+                
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
-        public async Task AddAsync(Courses course)
+        public async Task<bool> UpdateCourseAsync(Courses course)
         {
-            course.CreatedAt = DateTime.Now;
-            _context.CoursesDb.Add(course);
-            await _context.SaveChangesAsync();
+            try
+            {
+                var existingCourse = await _context.CoursesDb.FindAsync(course.CourseID);
+                if (existingCourse == null)
+                    return false;
+
+                existingCourse.CourseCode = course.CourseCode;
+                existingCourse.CourseName = course.CourseName;
+                existingCourse.Description = course.Description;
+                existingCourse.Credits = course.Credits;
+                existingCourse.Department = course.Department;
+                existingCourse.CreatedAt = DateTime.Now;
+
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
 
-        public async Task UpdateAsync(Courses course)
+        public async Task<bool> DeleteCourseAsync(int id)
         {
-            var existing = await _context.CoursesDb.FindAsync(course.CourseID);
-            if (existing == null) return;
+            try
+            {
+                var course = await _context.CoursesDb.FindAsync(id);
+                if (course == null)
+                    return false;
 
-            existing.CourseCode = course.CourseCode;
-            existing.CourseName = course.CourseName;
-            existing.Description = course.Description;
-            existing.Credits = course.Credits;
-            existing.Department = course.Department;
-            existing.CreatedAt = DateTime.Now;
-
-            await _context.SaveChangesAsync();
+                _context.CoursesDb.Remove(course);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

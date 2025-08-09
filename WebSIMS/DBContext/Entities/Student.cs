@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using WebSIMS.BDContext.Entities;
+using System.ComponentModel;
 using WebSIMS.DBContext.Entities;
 
 namespace WebSIMS.DBContext.Entities
@@ -10,8 +10,10 @@ namespace WebSIMS.DBContext.Entities
         [Key]
         public int StudentID { get; set; }
 
-        [Required]
-        [StringLength(20)]
+        [Required(ErrorMessage = "Student Code is required")]
+        [StringLength(20, ErrorMessage = "Student Code cannot exceed 20 characters")]
+        [RegularExpression(@"^[A-Z0-9]+$", ErrorMessage = "Student Code must contain only uppercase letters and numbers")]
+        [Display(Name = "Student Code")]
         public string StudentCode { get; set; } = string.Empty;
 
         [Required]
@@ -40,7 +42,8 @@ namespace WebSIMS.DBContext.Entities
         // Foreign key
         public int UserID { get; set; }
 
-        // Navigation property  
+        // Navigation properties
         public Users? User { get; set; }
+        public ICollection<StudentCourses>? StudentCourses { get; set; }
     }
 }

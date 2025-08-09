@@ -1,0 +1,101 @@
+@model List<WebSIMS.DBContext.Entities.StudentCourses>
+
+@{
+    ViewData["Title"] = "Student Course Enrollments";
+}
+
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Student Course Enrollments</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Dashboard</a></li>
+        <li class="breadcrumb-item active">Student Course Enrollments</li>
+    </ol>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <i class="fas fa-table me-1"></i>
+            All Enrollments
+        </div>
+        <div class="card-body">
+            <table id="datatablesSimple" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Student Course ID</th>
+                        <th>Student</th>
+                        <th>Course</th>
+                        <th>Enrollment Date</th>
+                        <th>Grade</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var enrollment in Model)
+                    {
+                        <tr>
+                            <td>@enrollment.StudentCourseID</td>
+                            <td>
+                                @if (enrollment.Student != null)
+                                {
+                                    @($"{enrollment.Student.FirstName} {enrollment.Student.LastName} ({enrollment.Student.StudentCode})")
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Student not found</span>
+                                }
+                            </td>
+                            <td>
+                                @if (enrollment.Course != null)
+                                {
+                                    @($"{enrollment.Course.CourseCode} - {enrollment.Course.CourseName}")
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Course not found</span>
+                                }
+                            </td>
+                            <td>@(enrollment.EnrollmentDate?.ToString("dd/MM/yyyy") ?? "N/A")</td>
+                            <td>@(enrollment.Grade ?? "N/A")</td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a asp-action="StudentEnrollments" asp-route-studentId="@enrollment.StudentID" 
+                                       class="btn btn-sm btn-info">View Student</a>
+                                    <a asp-action="CourseEnrollments" asp-route-courseId="@enrollment.CourseID" 
+                                       class="btn btn-sm btn-warning">View Course</a>
+                                    <form asp-action="RemoveEnrollment" method="post" style="display: inline;">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="studentId" value="@enrollment.StudentID" />
+                                        <input type="hidden" name="courseId" value="@enrollment.CourseID" />
+                                        <button type="submit" class="btn btn-sm btn-danger" 
+                                                onclick="return confirm('Are you sure you want to remove this enrollment?')">
+                                            Remove
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/sims/js/datatables-simple-demo.js"></script>
+}

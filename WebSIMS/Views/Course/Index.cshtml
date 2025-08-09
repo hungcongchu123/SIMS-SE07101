@@ -1,8 +1,12 @@
-﻿@model IEnumerable<WebSIMS.BDContext.Entities.Courses>
+﻿@model IEnumerable<WebSIMS.DBContext.Entities.Courses>
 
 @{
     ViewData["Title"] = "Course List";
     Layout = "~/Views/Shared/_LayoutMain.cshtml";
+    var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "Student";
+    var isAdmin = userRole == "Admin";
+    var isFaculty = userRole == "Faculty";
+    var isStudent = userRole == "Student";
 }
 
 <div class="container d-flex flex-column align-items-center">
@@ -23,7 +27,10 @@
         </div>
     }
 
-    <a asp-action="Create" class="btn btn-primary my-3">Add New Course</a>
+    @if (isAdmin)
+    {
+        <a asp-action="Create" class="btn btn-primary my-3">Add New Course</a>
+    }
 
     <table class="table table-bordered table-striped w-100">
         <thead>
@@ -33,7 +40,10 @@
                 <th>Description</th>
                 <th>Credits</th>
                 <th>Department</th>
-                <th>Actions</th>
+                @if (isAdmin)
+                {
+                    <th>Actions</th>
+                }
             </tr>
         </thead>
         <tbody>
@@ -45,10 +55,13 @@
                     <td>@item.Description</td>
                     <td>@item.Credits</td>
                     <td>@item.Department</td>
-                    <td class="d-flex justify-content-around">
-                        <a asp-action="Edit" asp-route-id="@item.CourseID" class="btn btn-warning btn-sm">Edit</a>
-                        <a asp-action="Delete" asp-route-id="@item.CourseID" class="btn btn-danger btn-sm">Delete</a>
-                    </td>
+                    @if (isAdmin)
+                    {
+                        <td class="d-flex justify-content-around">
+                            <a asp-action="Edit" asp-route-id="@item.CourseID" class="btn btn-warning btn-sm">Edit</a>
+                            <a asp-action="Delete" asp-route-id="@item.CourseID" class="btn btn-danger btn-sm">Delete</a>
+                        </td>
+                    }
                 </tr>
             }
         </tbody>

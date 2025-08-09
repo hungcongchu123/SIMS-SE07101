@@ -1,16 +1,13 @@
-﻿// File: ICourseService.cs
-using WebSIMS.BDContext.Entities;
-using System.Threading.Tasks;
-using System.Collections.Generic;
+﻿using WebSIMS.DBContext.Entities;
 
-namespace WebSIMS.Services.Interfaces // Namespace chính xác
+namespace WebSIMS.Interfaces
 {
-    public interface ICourseService // Tên interface chính xác
+    public interface ICourseService
     {
-        Task<IEnumerable<Courses>> GetAllAsync();
-        Task<Courses?> GetByIdAsync(int id);
-        Task<bool> DeleteAsync(int id);
-        Task AddAsync(Courses course);
-        Task UpdateAsync(Courses course);
+        Task<List<Courses>> GetAllCoursesAsync();
+        Task<Courses?> GetCourseByIdAsync(int id);
+        Task<bool> AddCourseAsync(Courses course);
+        Task<bool> UpdateCourseAsync(Courses course);
+        Task<bool> DeleteCourseAsync(int id);
     }
 }

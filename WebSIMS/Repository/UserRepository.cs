@@ -15,32 +15,32 @@ namespace WebSIMS.Repositories
 
         public async Task AddAsync(Users user)
         {
-            await _dbContext.Users.AddAsync(user);
+            await _dbContext.UsersDb.AddAsync(user);
         }
 
         public void Update(Users user)
         {
-            _dbContext.Users.Update(user);
+            _dbContext.UsersDb.Update(user);
         }
 
         public void Delete(Users user)
         {
-            _dbContext.Users.Remove(user);
+            _dbContext.UsersDb.Remove(user);
         }
 
         public async Task<Users?> GetUserById(int id)
         {
-            return await _dbContext.Users.FindAsync(id);
+            return await _dbContext.UsersDb.FindAsync(id);
         }
 
         public async Task<Users?> GetUserByUsername(string username)
         {
-            return await _dbContext.Users.FirstOrDefaultAsync(u => u.Username == username);
+            return await _dbContext.UsersDb.FirstOrDefaultAsync(u => u.Username == username);
         }
 
         public async Task<List<Users>> GetAllAsync()
         {
-            return await _dbContext.Users.ToListAsync();
+            return await _dbContext.UsersDb.ToListAsync();
         }
 
         public async Task SaveChangeAsync()

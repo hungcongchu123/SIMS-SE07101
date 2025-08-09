@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using WebSIMS.BDContext.Entities;
-using WebSIMS.Services.Interfaces;
+using WebSIMS.DBContext.Entities;
+using WebSIMS.Interfaces;
 
 namespace WebSIMS.Controllers
 {
-    [Authorize(Roles = "Admin,Faculty")]
+    [Authorize(Roles = "Admin,Faculty,Student")]
     public class CourseController : Controller
     {
         private readonly ICourseService _courseService;
@@ -19,17 +19,38 @@ namespace WebSIMS.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var courses = await _courseService.GetAllAsync();
+            var courses = await _courseService.GetAllCoursesAsync();
             return View(courses);
         }
 
         [HttpGet]
+        public async Task<IActionResult> Search(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            var allCourses = await _courseService.GetAllCoursesAsync();
+            var filteredCourses = allCourses.Where(c => 
+                c.CourseCode.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                c.CourseName.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                c.Department.Contains(query, StringComparison.OrdinalIgnoreCase)
+            ).ToList();
+
+            ViewBag.SearchQuery = query;
+            return View("Index", filteredCourses);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("CourseCode,CourseName,Description,Credits,Department")] Courses course)
         {
@@ -37,7 +58,12 @@ namespace WebSIMS.Controllers
             {
                 try
                 {
-                    await _courseService.AddAsync(course);
+                    var result = await _courseService.AddCourseAsync(course);
+                    if (!result)
+                    {
+                        TempData["ErrorMessage"] = "Failed to add course.";
+                        return View(course);
+                    }
                     TempData["SuccessMessage"] = "Course added successfully!";
                     return RedirectToAction(nameof(Index));
                 }
@@ -60,6 +86,7 @@ namespace WebSIMS.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -68,7 +95,7 @@ namespace WebSIMS.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            var course = await _courseService.GetByIdAsync(id.Value);
+            var course = await _courseService.GetCourseByIdAsync(id.Value);
             if (course == null)
             {
                 TempData["ErrorMessage"] = "Course not found.";
@@ -78,6 +105,7 @@ namespace WebSIMS.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("CourseID,CourseCode,CourseName,Description,Credits,Department,CreatedAt")] Courses course)
         {
@@ -91,7 +119,12 @@ namespace WebSIMS.Controllers
             {
                 try
                 {
-                    await _courseService.UpdateAsync(course);
+                    var result = await _courseService.UpdateCourseAsync(course);
+                    if (!result)
+                    {
+                        TempData["ErrorMessage"] = "Failed to update course.";
+                        return View(course);
+                    }
                     TempData["SuccessMessage"] = "Course updated successfully!";
                     return RedirectToAction(nameof(Index));
                 }
@@ -111,6 +144,7 @@ namespace WebSIMS.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -119,7 +153,7 @@ namespace WebSIMS.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            var course = await _courseService.GetByIdAsync(id.Value);
+            var course = await _courseService.GetCourseByIdAsync(id.Value);
             if (course == null)
             {
                 TempData["ErrorMessage"] = "Course not found.";
@@ -130,12 +164,18 @@ namespace WebSIMS.Controllers
         }
 
         [HttpPost, ActionName("Delete")]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             try
             {
-                await _courseService.DeleteAsync(id);
+                var result = await _courseService.DeleteCourseAsync(id);
+                if (!result)
+                {
+                    TempData["ErrorMessage"] = "Failed to delete course.";
+                    return RedirectToAction(nameof(Index));
+                }
                 TempData["SuccessMessage"] = "Course deleted successfully!";
             }
             catch (Exception ex)

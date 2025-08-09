@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WebSIMS.DBContext.Entities;
 using WebSIMS.Interfaces;
 using System.Threading.Tasks;
@@ -7,6 +8,7 @@ using System.Linq;
 
 namespace WebSIMS.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class UserController : Controller
     {
         private readonly IUserRepository _userRepository;
@@ -38,7 +40,7 @@ namespace WebSIMS.Controllers
             {
                 if (await _userRepository.GetUserByUsername(user.Username) != null)
                 {
-                    ModelState.AddModelError("Username", "Username đã tồn tại.");
+                    ModelState.AddModelError("Username", "Username already exists.");
                     return View(user);
                 }
 
@@ -46,12 +48,12 @@ namespace WebSIMS.Controllers
                 {
                     await _userRepository.AddAsync(user);
                     await _userRepository.SaveChangeAsync();
-                    TempData["SuccessMessage"] = "Thêm tài khoản thành công!";
+                    TempData["SuccessMessage"] = "Account created successfully!";
                     return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
                 {
-                    TempData["ErrorMessage"] = $"Lỗi khi thêm tài khoản: {ex.Message}";
+                    TempData["ErrorMessage"] = $"Error creating account: {ex.Message}";
                     return View(user);
                 }
             }
@@ -79,7 +81,7 @@ namespace WebSIMS.Controllers
                 var existingUser = await _userRepository.GetUserByUsername(user.Username);
                 if (existingUser != null && existingUser.UserID != user.UserID)
                 {
-                    ModelState.AddModelError("Username", "Username đã tồn tại.");
+                    ModelState.AddModelError("Username", "Username already exists.");
                     return View(user);
                 }
 
@@ -87,12 +89,12 @@ namespace WebSIMS.Controllers
                 {
                     _userRepository.Update(user);
                     await _userRepository.SaveChangeAsync();
-                    TempData["SuccessMessage"] = "Cập nhật tài khoản thành công!";
+                    TempData["SuccessMessage"] = "Account updated successfully!";
                     return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
                 {
-                    TempData["ErrorMessage"] = $"Lỗi khi cập nhật tài khoản: {ex.Message}";
+                    TempData["ErrorMessage"] = $"Error updating account: {ex.Message}";
                     return View(user);
                 }
             }
@@ -120,12 +122,12 @@ namespace WebSIMS.Controllers
                 {
                     _userRepository.Delete(user);
                     await _userRepository.SaveChangeAsync();
-                    TempData["SuccessMessage"] = "Xóa tài khoản thành công!";
+                    TempData["SuccessMessage"] = "Account deleted successfully!";
                 }
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = $"Lỗi khi xóa tài khoản: {ex.Message}";
+                TempData["ErrorMessage"] = $"Error deleting account: {ex.Message}";
             }
             return RedirectToAction(nameof(Index));
         }

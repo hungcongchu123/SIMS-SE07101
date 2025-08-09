@@ -2,6 +2,10 @@
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @{
+    var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "Student";
+    var isAdmin = userRole == "Admin";
+    var isFaculty = userRole == "Faculty";
+    var isStudent = userRole == "Student";
 }
 <div id="layoutSidenav_nav">
     <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
@@ -12,6 +16,34 @@
                     <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                     Dashboard
                 </a>
+                
+                @if (isAdmin)
+                {
+                    <div class="sb-sidenav-menu-heading">Admin Management</div>
+                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseUsers" aria-expanded="false" aria-controls="collapseUsers">
+                        <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
+                        Users
+                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                    </a>
+                    <div class="collapse" id="collapseUsers" aria-labelledby="headingUsers" data-bs-parent="#sidenavAccordion">
+                        <nav class="sb-sidenav-menu-nested nav">
+                            <a class="nav-link" href="@Url.Action("Create", "User")">Create new User</a>
+                            <a class="nav-link" href="@Url.Action("Index", "User")">List Users</a>
+                        </nav>
+                    </div>
+                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseFaculty" aria-expanded="false" aria-controls="collapseFaculty">
+                        <div class="sb-nav-link-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                        Faculty
+                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                    </a>
+                    <div class="collapse" id="collapseFaculty" aria-labelledby="headingFaculty" data-bs-parent="#sidenavAccordion">
+                        <nav class="sb-sidenav-menu-nested nav">
+                            <a class="nav-link" href="@Url.Action("Create", "Faculty")">Create new Faculty</a>
+                            <a class="nav-link" href="@Url.Action("Index", "Faculty")">List Faculty</a>
+                        </nav>
+                    </div>
+                }
+                
                 <div class="sb-sidenav-menu-heading">Managements</div>
                 <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
                     <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
@@ -20,7 +52,10 @@
                 </a>
                 <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="@Url.Action("Create", "Student")">Create new Student</a>
+                        @if (isAdmin)
+                        {
+                            <a class="nav-link" href="@Url.Action("Create", "Student")">Create new Student</a>
+                        }
                         <a class="nav-link" href="@Url.Action("Index", "Student")">List Student</a>
                     </nav>
                 </div>
@@ -31,11 +66,26 @@
                 </a>
                 <div class="collapse" id="collapsePages" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages">
-                        <a class="nav-link collapsed" href="@Url.Action("Create", "Course")">
-                            Create new Courses
-                        </a>
+                        @if (isAdmin)
+                        {
+                            <a class="nav-link collapsed" href="@Url.Action("Create", "Course")">
+                                Create new Courses
+                            </a>
+                        }
                         <a class="nav-link collapsed" href="@Url.Action("Index", "Course")">
                             Courses Lists
+                        </a>
+                    </nav>
+                </div>
+                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseEnrollments" aria-expanded="false" aria-controls="collapseEnrollments">
+                    <div class="sb-nav-link-icon"><i class="fas fa-graduation-cap"></i></div>
+                    Enrollments
+                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                </a>
+                <div class="collapse" id="collapseEnrollments" aria-labelledby="headingThree" data-bs-parent="#sidenavAccordion">
+                    <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionEnrollments">
+                        <a class="nav-link collapsed" href="@Url.Action("Index", "Enrollment")">
+                            Manage Subscriptions
                         </a>
                     </nav>
                 </div>
@@ -43,7 +93,7 @@
         </div>
         <div class="sb-sidenav-footer">
             <div class="small">Logged in as:</div>
-            HRO1911
+            @userRole
         </div>
     </nav>
 </div>

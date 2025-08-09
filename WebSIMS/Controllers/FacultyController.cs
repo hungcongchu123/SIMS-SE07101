@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using WebSIMS.DBContext.Entities;
 using WebSIMS.Services.Interfaces;
 using System.Threading.Tasks;
@@ -8,6 +10,7 @@ using WebSIMS.DBContext;
 
 namespace WebSIMS.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class FacultyController : Controller
     {
         private readonly IFacultyService _facultyService;
@@ -26,22 +29,30 @@ namespace WebSIMS.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("FirstName,LastName,Email,HireDate")] Faculty faculty)
+        public async Task<IActionResult> Create([Bind("FirstName,LastName,Email,HireDate")] Faculty faculty, string password)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
+                    // Kiểm tra email đã tồn tại chưa
+                    var existingUser = await _context.UsersDb.FirstOrDefaultAsync(u => u.Username == faculty.Email);
+                    if (existingUser != null)
+                    {
+                        ModelState.AddModelError("Email", "Email already exists as a username.");
+                        return View(faculty);
+                    }
+
                     // Tạo một đối tượng Users mới
                     var user = new Users
                     {
                         Role = "Faculty",
                         Username = faculty.Email,
-                        PasswordHash = "hashed_password_default"
+                        PasswordHash = password // Trong thực tế nên hash password
                     };
 
                     // Thêm User vào database trước để có UserID
-                    _context.Users.Add(user);
+                    _context.UsersDb.Add(user);
                     await _context.SaveChangesAsync();
 
                     // Gán UserID đã tạo cho Faculty
@@ -50,12 +61,12 @@ namespace WebSIMS.Controllers
                     // Thêm Faculty vào database
                     await _facultyService.AddAsync(faculty);
 
-                    TempData["SuccessMessage"] = "Thêm giảng viên thành công!";
+                    TempData["SuccessMessage"] = "Faculty created successfully! Username: " + faculty.Email + ", Password: " + password;
                     return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
                 {
-                    TempData["ErrorMessage"] = $"Lỗi khi thêm giảng viên: {ex.Message}";
+                    TempData["ErrorMessage"] = $"Error creating faculty: {ex.Message}";
                     return View(faculty);
                 }
             }

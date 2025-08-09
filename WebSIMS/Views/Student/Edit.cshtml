@@ -15,7 +15,7 @@
 
         <div class="mb-3">
             <label class="form-label">Student Code</label>
-            <input asp-for="StudentCode" class="form-control" />
+            <input asp-for="StudentCode" class="form-control" required oninput="this.value = this.value.toUpperCase()" />
             <span asp-validation-for="StudentCode" class="text-danger"></span>
         </div>
 

@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using WebSIMS.BDContext.Entities;
 using WebSIMS.DBContext.Entities;
 using WebSIMS.Models;
 
@@ -13,7 +12,7 @@ namespace WebSIMS.DBContext
         public DbSet<Users> UsersDb { get; set; }
         public DbSet<Student> StudentsDb { get; set; }
         public DbSet<Faculty> Faculties { get; set; }
-        public DbSet<Users> Users { get; set; }
+        public DbSet<StudentCourses> StudentCoursesDb { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -47,6 +46,22 @@ namespace WebSIMS.DBContext
                 .HasOne(f => f.User)
                 .WithMany()
                 .HasForeignKey(f => f.UserID);
+
+            // Table StudentCourses
+            modelBuilder.Entity<StudentCourses>().ToTable("StudentCourses");
+            modelBuilder.Entity<StudentCourses>().HasKey(sc => sc.StudentCourseID);
+
+            // Relationship Student and StudentCourses
+            modelBuilder.Entity<StudentCourses>()
+                .HasOne(sc => sc.Student)
+                .WithMany(s => s.StudentCourses)
+                .HasForeignKey(sc => sc.StudentID);
+
+            // Relationship Courses and StudentCourses
+            modelBuilder.Entity<StudentCourses>()
+                .HasOne(sc => sc.Course)
+                .WithMany(c => c.StudentCourses)
+                .HasForeignKey(sc => sc.CourseID);
         }
     }
 }

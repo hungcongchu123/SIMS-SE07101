@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 
-namespace WebSIMS.BDContext.Entities
+namespace WebSIMS.DBContext.Entities
 {
     public class Courses
     {
@@ -10,10 +10,10 @@ namespace WebSIMS.BDContext.Entities
         public int CourseID { get; set; }
 
         [Column("CourseCode", TypeName = "nvarchar(20)"), Required]
-        public string CourseCode { get; set; }
+        public required string CourseCode { get; set; }
 
         [Column("CourseName", TypeName = "nvarchar(100)"), Required]
-        public string CourseName { get; set; }
+        public required string CourseName { get; set; }
 
         [Column("Description", TypeName = "nvarchar(200)"), AllowNull]
         public string Description { get; set; }
@@ -26,5 +26,8 @@ namespace WebSIMS.BDContext.Entities
 
         [AllowNull]
         public DateTime? CreatedAt { get; set; }
+
+        // Navigation property
+        public ICollection<WebSIMS.DBContext.Entities.StudentCourses>? StudentCourses { get; set; }
     }
 }

@@ -1,6 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using WebSIMS.BDContext;
-using WebSIMS.BDContext.Entities;
 using WebSIMS.DBContext;
 using WebSIMS.DBContext.Entities;
 using WebSIMS.Interfaces;

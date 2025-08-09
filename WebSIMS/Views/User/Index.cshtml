@@ -27,9 +27,16 @@
                     <td>@user.UserID</td>
                     <td>@user.Username</td>
                     <td>@user.Role</td>
+                    <td>@(user.CreatedAt?.ToString("dd/MM/yyyy HH:mm") ?? "N/A")</td>
                     <td>
-                        <a asp-action="Edit" asp-route-id="@user.UserID" class="btn btn-warning btn-sm">Edit</a>
-                        <a asp-action="Delete" asp-route-id="@user.UserID" class="btn btn-danger btn-sm">Delete</a>
+                        <div class="btn-group" role="group">
+                            <a asp-action="Edit" asp-route-id="@user.UserID" class="btn btn-warning btn-sm">
+                                <i class="fas fa-edit"></i> Edit
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@user.UserID" class="btn btn-danger btn-sm">
+                                <i class="fas fa-trash"></i> Delete
+                            </a>
+                        </div>
                     </td>
                 </tr>
             }
