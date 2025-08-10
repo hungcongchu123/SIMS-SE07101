@@ -5,6 +5,8 @@ VisualStudioVersion = 17.14.36310.24
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebSIMS", "WebSIMS\WebSIMS.csproj", "{060F6D28-2DA4-45F5-93A5-9220E7740DC4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebSIMS.Tests", "WebSIMS.Tests\WebSIMS.Tests.csproj", "{8F7CC0EB-550A-406E-AA11-D553757383D4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{060F6D28-2DA4-45F5-93A5-9220E7740DC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{060F6D28-2DA4-45F5-93A5-9220E7740DC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{060F6D28-2DA4-45F5-93A5-9220E7740DC4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8F7CC0EB-550A-406E-AA11-D553757383D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F7CC0EB-550A-406E-AA11-D553757383D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F7CC0EB-550A-406E-AA11-D553757383D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F7CC0EB-550A-406E-AA11-D553757383D4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

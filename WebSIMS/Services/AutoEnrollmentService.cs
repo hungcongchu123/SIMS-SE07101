@@ -15,13 +15,13 @@ namespace WebSIMS.Services
             _enrollmentService = enrollmentService;
         }
 
-        // Tự động đăng ký student mới vào tất cả courses hiện có
+        // Automatically enroll new students into all existing courses
         public async Task AutoEnrollNewStudentAsync(int studentId)
         {
             var courses = await _context.CoursesDb.ToListAsync();
             foreach (var course in courses)
             {
-                // Kiểm tra xem đã đăng ký chưa trước khi thêm
+                // Check if registered before adding
                 var existingEnrollment = await _context.StudentCoursesDb
                     .FirstOrDefaultAsync(sc => sc.StudentID == studentId && sc.CourseID == course.CourseID);
                 
@@ -32,13 +32,13 @@ namespace WebSIMS.Services
             }
         }
 
-        // Tự động đăng ký tất cả students hiện có vào course mới
+        // Automatically register all existing students to the new course
         public async Task AutoEnrollNewCourseAsync(int courseId)
         {
             var students = await _context.StudentsDb.ToListAsync();
             foreach (var student in students)
             {
-                // Kiểm tra xem đã đăng ký chưa trước khi thêm
+                // Check if registered before adding
                 var existingEnrollment = await _context.StudentCoursesDb
                     .FirstOrDefaultAsync(sc => sc.StudentID == student.StudentID && sc.CourseID == courseId);
                 

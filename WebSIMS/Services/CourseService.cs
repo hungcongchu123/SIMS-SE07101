@@ -33,8 +33,8 @@ namespace WebSIMS.Services
                 course.CreatedAt = DateTime.Now;
                 _context.CoursesDb.Add(course);
                 await _context.SaveChangesAsync();
-                
-                // Tự động đăng ký tất cả students hiện có vào course mới
+
+                // Automatically register all existing students to the new course
                 await _autoEnrollmentService.AutoEnrollNewCourseAsync(course.CourseID);
                 
                 return true;
