@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Course Enrollment Management";
+    Layout = "~/Views/Shared/_LayoutMain.cshtml";
     var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "Student";
     var isAdmin = userRole == "Admin";
     var isFaculty = userRole == "Faculty";

@@ -68,6 +68,24 @@ namespace WebSIMS.Controllers
                         return View(student);
                     }
 
+                    // Kiểm tra Email trùng lặp
+                    if (!string.IsNullOrWhiteSpace(student.Email) && await _studentService.IsEmailExistsAsync(student.Email))
+                    {
+                        ModelState.AddModelError(nameof(student.Email), "Email already exists in the system.");
+                        var courses = await _courseService.GetAllCoursesAsync();
+                        ViewBag.Courses = new SelectList(courses, "CourseName", "CourseName");
+                        return View(student);
+                    }
+
+                    // Kiểm tra Phone trùng lặp
+                    if (!string.IsNullOrWhiteSpace(student.Phone) && await _studentService.IsPhoneExistsAsync(student.Phone))
+                    {
+                        ModelState.AddModelError(nameof(student.Phone), "Phone number already exists in the system.");
+                        var courses = await _courseService.GetAllCoursesAsync();
+                        ViewBag.Courses = new SelectList(courses, "CourseName", "CourseName");
+                        return View(student);
+                    }
+
                     var userIdClaim = User.FindFirst("UserID")?.Value;
 
                     if (!int.TryParse(userIdClaim, out int userId))
@@ -164,6 +182,24 @@ namespace WebSIMS.Controllers
                     if (await _studentService.IsStudentCodeExistsAsync(student.StudentCode, student.StudentID))
                     {
                         ModelState.AddModelError(nameof(student.StudentCode), "Student code already exists in the system.");
+                        var courses = await _courseService.GetAllCoursesAsync();
+                        ViewBag.Courses = new SelectList(courses, "CourseName", "CourseName");
+                        return View(student);
+                    }
+
+                    // Kiểm tra Email trùng lặp (loại trừ student hiện tại)
+                    if (!string.IsNullOrWhiteSpace(student.Email) && await _studentService.IsEmailExistsAsync(student.Email, student.StudentID))
+                    {
+                        ModelState.AddModelError(nameof(student.Email), "Email already exists in the system.");
+                        var courses = await _courseService.GetAllCoursesAsync();
+                        ViewBag.Courses = new SelectList(courses, "CourseName", "CourseName");
+                        return View(student);
+                    }
+
+                    // Kiểm tra Phone trùng lặp (loại trừ student hiện tại)
+                    if (!string.IsNullOrWhiteSpace(student.Phone) && await _studentService.IsPhoneExistsAsync(student.Phone, student.StudentID))
+                    {
+                        ModelState.AddModelError(nameof(student.Phone), "Phone number already exists in the system.");
                         var courses = await _courseService.GetAllCoursesAsync();
                         ViewBag.Courses = new SelectList(courses, "CourseName", "CourseName");
                         return View(student);

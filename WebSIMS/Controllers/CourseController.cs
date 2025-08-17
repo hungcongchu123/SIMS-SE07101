@@ -40,6 +40,7 @@ namespace WebSIMS.Controllers
 
             ViewBag.SearchQuery = query;
             return View("Index", filteredCourses);
+            // xu ly search
         }
 
         [HttpGet]

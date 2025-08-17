@@ -95,5 +95,23 @@ namespace WebSIMS.Services
             return await _context.StudentsDb
                 .AnyAsync(s => s.StudentCode == studentCode && s.StudentID != excludeStudentId);
         }
+
+        public async Task<bool> IsEmailExistsAsync(string email, int excludeStudentId = 0)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                return false;
+                
+            return await _context.StudentsDb
+                .AnyAsync(s => s.Email == email && s.StudentID != excludeStudentId);
+        }
+
+        public async Task<bool> IsPhoneExistsAsync(string phone, int excludeStudentId = 0)
+        {
+            if (string.IsNullOrWhiteSpace(phone))
+                return false;
+                
+            return await _context.StudentsDb
+                .AnyAsync(s => s.Phone == phone && s.StudentID != excludeStudentId);
+        }
     }
 }
